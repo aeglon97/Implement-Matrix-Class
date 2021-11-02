@@ -29,21 +29,26 @@ def dot_product(vector_one, vector_two):
     return sum_vectors
 
 class Matrix(object):
-
-    # Constructor
     def __init__(self, grid):
         self.g = grid
         self.h = len(grid)
         self.w = len(grid[0])
 
-    #
-    # Primary matrix math methods
-    #############################
- 
+    #-----Primary matrix math methods-----#
     def determinant(self):
         """
         Calculates the determinant of a 1x1 or 2x2 matrix.
+        Determinant: The product of all a[i][j] where i = j MINUS the product of
+                     all a[i][j] where j = width - (i-1).
+                        for a in matrix A containing i rows and j columns.
+                            
+        --> 2x2 Product of the major diagonals (top-left to bottom-right) 
+                MINUS the product of the backward diagonals (top-right to bottom-left).
+                
+        --> 3x3 and larger: see Rule of Sarrus.
+        
         """
+        
         if not self.is_square():
             raise(ValueError, "Cannot calculate determinant of non-square matrix.")
             
@@ -62,7 +67,10 @@ class Matrix(object):
     def trace(self):
         """
         Calculates the trace of a matrix (sum of diagonal entries).
+        Trace: The sum of all a[i][j] where i = j, for element a in matrix A containing i rows and j columns.
+        --> The sum of the major diagonal values (top-left to bottom-right).
         """
+        
         if not self.is_square():
             raise(ValueError, "Cannot calculate the trace of a non-square matrix.")
 
@@ -76,25 +84,48 @@ class Matrix(object):
     def inverse(self):
         """
         Calculates the inverse of a 1x1 or 2x2 Matrix.
+        --> If the inverse of scalar x is 1/x, then the inverse of matrix A is A^-1.
+        --> Similarly, if x * (1/x) = 1, then A * A^-1 = I.
+        
+        1x1 matrix -- Formal mathematical definition: A^-1 = [[1/a]] for a in matrix A.
+        2x2 matrix -- Formal mathematical definition: (1/det) * [(traceA * I) - A]
+             
         """
         if not self.is_square():
             raise(ValueError, "Non-square Matrix does not have an inverse.")
+            
         if self.h > 2:
-            raise(NotImplementedError, "inversion not implemented for matrices larger than 2x2.")
+            raise(NotImplementedError, "Inversion not implemented for matrices larger than 2x2.")
 
         if self.h == 1 and self.w == 1:
             return Matrix([[1/self.g[0][0]]])
+        
         elif self.h == 2 and self.w == 2:
-            raise(NotImplementedError, "TODO: add code for 2x2 matrix.")
             factor = 1 / self.determinant()
             trace_times_I = self.trace() * identity(2)
-        
+            trace_times_I_minus_A = trace_times_I - self.g
+            
+            inverse = factor * trace_times_I_minus_A
+            
+            return inverse
         
     def T(self):
         """
         Returns a transposed copy of this Matrix.
-        """
-        # TODO - your code here
+        Formal mathematical definition: [A^T]_i,j = A_j,i
+        --> Each element in matrix A at index [i,j] will be at index [j,i] in the transposed matrix.
+        """      
+        transpose = []
+        
+        for i_col in range(self.w):
+            transposed_row = []
+            for i_row in range(self.h):
+                transposed_row.append(self.g[i_col][i_row])
+                
+            transpose.append(transposed_row)
+        
+        return Matrix(transpose)
+        
 
     def is_square(self):
         return self.h == self.w
@@ -114,6 +145,7 @@ class Matrix(object):
         > my_matrix[0][0]
           1
         """
+        
         return self.g[idx]
 
     def __repr__(self):
@@ -221,8 +253,8 @@ class Matrix(object):
         if isinstance(other, numbers.Number):
             scalar_matrix = []
             
-            for i_row in self.g:
-                for i_col in self.g:
+            for i_row in range(self.h):
+                for i_col in range(self.w):
                     scalar_matrix.append(self.g[i_row][i_col] * other)
                     
         return Matrix(scalar_matrix)
