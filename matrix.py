@@ -46,10 +46,18 @@ class Matrix(object):
         """
         if not self.is_square():
             raise(ValueError, "Cannot calculate determinant of non-square matrix.")
-        if self.h > 2:
-            raise(NotImplementedError, "Calculating determinant not implemented for matrices larger than 2x2.")
-
-        return (self.g[0][0] * self.g[1][1] - self.g[0][1] * self.g[1][0])
+            
+        if not self.g:
+            raise(ValueError, "Cannot find the determinant of an empty matrix.")
+            
+        if (self.h == 1 and self.w == 1):
+            return (self.g[0][0])
+        
+        elif (self.h == 2 and self.w == 2):
+            return (self.g[0][0] * self.g[1][1] - self.g[0][1] * self.g[1][0])
+        
+        else:
+            raise(NotImplementedError, "Calculating determinant not implemented for matrices larger than 2x2.") 
 
     def trace(self):
         """
@@ -58,7 +66,12 @@ class Matrix(object):
         if not self.is_square():
             raise(ValueError, "Cannot calculate the trace of a non-square matrix.")
 
-        return (self.g[0][0] + self.g[1][1])
+        trace = 0
+        
+        for n in range(self.h):
+            trace += self.g[n][n]
+            
+        return trace
                       
     def inverse(self):
         """
@@ -69,10 +82,13 @@ class Matrix(object):
         if self.h > 2:
             raise(NotImplementedError, "inversion not implemented for matrices larger than 2x2.")
 
-        factor = 1 / self.determinant()
-        trace_times_I = self.trace() * identity(2)
-            
-
+        if self.h == 1 and self.w == 1:
+            return Matrix([[1/self.g[0][0]]])
+        elif self.h == 2 and self.w == 2:
+            raise(NotImplementedError, "TODO: add code for 2x2 matrix.")
+            factor = 1 / self.determinant()
+            trace_times_I = self.trace() * identity(2)
+        
     def T(self):
         """
         Returns a transposed copy of this Matrix.
@@ -125,7 +141,7 @@ class Matrix(object):
  
             matrix_sum.append(row_result)
                 
-        return matrix_sum
+        return Matrix(matrix_sum)
 
     def __neg__(self):
         """
@@ -147,7 +163,7 @@ class Matrix(object):
                 
             neg_matrix.append(row_result)
             
-        return neg_matrix
+        return Matrix(neg_matrix)
                 
     def __sub__(self, other):
         """
@@ -166,7 +182,7 @@ class Matrix(object):
                 
             matrix_difference.append(row_result)
         
-        return matrix_difference
+        return Matrix(matrix_difference)
     
     def __mul__(self, other):
         """
@@ -186,6 +202,8 @@ class Matrix(object):
                 col_vals = [row[i_col] for row in other.g]
                 row_result.append(dot_product(self.g[i_row], col_vals))
             matrix_product.append(row_result)
+            
+        return Matrix(matrix_product)
               
 
     def __rmul__(self, other):
