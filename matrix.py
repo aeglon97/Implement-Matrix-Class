@@ -17,6 +17,16 @@ def identity(n):
         for i in range(n):
             I.g[i][i] = 1.0
         return I
+    
+def dot_product(vector_one, vector_two):
+    if len(vector_one) != len(vector_two):
+        raise(ValueError, "Vectors must be the same length.")
+
+    sum_vectors = 0
+    for i in range(len(vector_one)):
+        sum_vectors += vector_one[i] * vector_two[i]
+        
+    return sum_vectors
 
 class Matrix(object):
 
@@ -38,8 +48,7 @@ class Matrix(object):
             raise(ValueError, "Cannot calculate determinant of non-square matrix.")
         if self.h > 2:
             raise(NotImplementedError, "Calculating determinant not implemented for matrices larger than 2x2.")
-        
-        # TODO - your code here
+
         return (self.g[0][0] * self.g[1][1] - self.g[0][1] * self.g[1][0])
 
     def trace(self):
@@ -61,7 +70,7 @@ class Matrix(object):
             raise(NotImplementedError, "inversion not implemented for matrices larger than 2x2.")
 
         factor = 1 / self.determinant()
-        trace_times_I = self.trace() * 
+        trace_times_I = self.trace() * identity(2)
             
 
     def T(self):
@@ -72,7 +81,7 @@ class Matrix(object):
 
     def is_square(self):
         return self.h == self.w
-
+    
     #-----OPERATOR OVERLOADING-----#
     def __getitem__(self,idx):
         """
@@ -95,8 +104,8 @@ class Matrix(object):
         Defines the behavior of calling print on an instance of this class.
         """
         s = ""
-        for row in self.g:
-            s += " ".join(["{} ".format(x) for x in row])
+        for i_row in self.g:
+            s += " ".join(["{} ".format(x) for x in i_row])
             s += "\n"
         return s
 
@@ -106,9 +115,17 @@ class Matrix(object):
         """
         if self.h != other.h or self.w != other.w:
             raise(ValueError, "Matrices can only be added if the dimensions are the same") 
-        #   
-        # TODO - your code here
-        #
+        
+        matrix_sum = []
+        
+        for i_row in range(self.h):
+            row_result = []
+            for i_col in range(other.w):
+                row_result.append(self.g[i_row][i_col] + other.g[i_row][i_col])
+ 
+            matrix_sum.append(row_result)
+                
+        return matrix_sum
 
     def __neg__(self):
         """
@@ -122,25 +139,54 @@ class Matrix(object):
           -1.0  -2.0
           -3.0  -4.0
         """
-        #   
-        # TODO - your code here
-        #
-
+        neg_matrix = []
+        for i_row in range(self.h):
+            row_result = []
+            for i_col in range(self.w):
+                row_result.append(self.g[i_row][i_col] * (-1))
+                
+            neg_matrix.append(row_result)
+            
+        return neg_matrix
+                
     def __sub__(self, other):
         """
         Defines the behavior of - operator (as subtraction)
         """
-        #   
-        # TODO - your code here
-        #
-
+        
+        if self.h != other.h or self.w != other.w:
+            raise(ValueError, "Matrices can only be added if the dimensions are the same") 
+            
+        matrix_difference = []
+        
+        for i_row in range(self.h):
+            row_result = []
+            for col in range(other.w):
+                row_result.append(self.g[i_row][i_col] - other.g[i_row][i_col])
+                
+            matrix_difference.append(row_result)
+        
+        return matrix_difference
+    
     def __mul__(self, other):
         """
         Defines the behavior of * operator (matrix multiplication)
         """
-        #   
-        # TODO - your code here
-        #
+        
+        if self.w != other.h:
+            raise(ValueError, "The number of columns of Matrix A must equal the number of rows in Matrix B")
+            
+        matrix_product = []
+        
+#         [row[1] for row in A]
+        
+        for i_row in range(self.h):
+            row_result = []
+            for i_col in range(other.w):
+                col_vals = [row[i_col] for row in other.g]
+                row_result.append(dot_product(self.g[i_row], col_vals))
+            matrix_product.append(row_result)
+              
 
     def __rmul__(self, other):
         """
