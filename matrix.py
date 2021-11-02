@@ -89,6 +89,7 @@ class Matrix(object):
             factor = 1 / self.determinant()
             trace_times_I = self.trace() * identity(2)
         
+        
     def T(self):
         """
         Returns a transposed copy of this Matrix.
@@ -193,8 +194,7 @@ class Matrix(object):
             raise(ValueError, "The number of columns of Matrix A must equal the number of rows in Matrix B")
             
         matrix_product = []
-        
-#         [row[1] for row in A]
+
         
         for i_row in range(self.h):
             row_result = []
@@ -205,10 +205,10 @@ class Matrix(object):
             
         return Matrix(matrix_product)
               
-
+    #Scalar multiplication
     def __rmul__(self, other):
         """
-        Called when the thing on the left of the * is not a matrix.
+        Called when the thing on the left of the * is a scalar value.
 
         Example:
 
@@ -219,8 +219,10 @@ class Matrix(object):
           0.0  2.0
         """
         if isinstance(other, numbers.Number):
-            pass
-            #   
-            # TODO - your code here
-            #
+            scalar_matrix = []
             
+            for i_row in self.g:
+                for i_col in self.g:
+                    scalar_matrix.append(self.g[i_row][i_col] * other)
+                    
+        return Matrix(scalar_matrix)
