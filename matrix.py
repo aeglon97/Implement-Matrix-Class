@@ -93,7 +93,7 @@ class Matrix(object):
         if not self.is_square():
             raise(ValueError, "Non-square Matrix does not have an inverse.")
             
-        if self.h > 2:
+        if self.h > 2 or self.w > 2:
             raise(NotImplementedError, "Inversion not implemented for matrices larger than 2x2.")
 
         if self.h == 1 and self.w == 1:
@@ -108,12 +108,14 @@ class Matrix(object):
             inverse = factor * trace_times_I2_minus_A
             
             return inverse
+ 
         
     def T(self):
         """
         Returns a transposed copy of this Matrix.
         Formal mathematical definition: [A^T]_i,j = A_j,i
-        --> Each element in matrix A at index [i,j] will be at index [j,i] in the transposed matrix.
+        --> Each element in matrix A at index [i,j] will be at index [j,i] in the 
+        transposed matrix.
         """      
         transpose = []
         
@@ -222,6 +224,8 @@ class Matrix(object):
         Defines the behavior of * operator (matrix multiplication)
         
         matrixA * matrixB = dot product of every column (matrixB) per row in matrixA
+        
+        --> if matrixA = j * k and matrixB = k * l, then the product matrix will be size j * l.
         """
         
         # If self or other is a Number, a mismatched type error will return after this if statement
@@ -251,6 +255,8 @@ class Matrix(object):
         > print(doubled)
           2.0  0.0
           0.0  2.0
+          
+        Note: if __mul__ fails, then __rmul__ is automatically invoked next.
         """
         if isinstance(other, numbers.Number):
             scalar_matrix = []
@@ -262,23 +268,3 @@ class Matrix(object):
                 scalar_matrix.append(row)
                     
         return Matrix(scalar_matrix)
-    
-def equal(m1, m2):
-    if len(m1.g) != len(m2.g): return False
-    if len(m1.g[0]) != len(m2.g[0]): return False
-    for r1, r2 in zip(m1.g, m2.g):
-        for v1, v2 in zip(r1, r2):
-            if abs(v1 - v2) > 0.0001:
-                return False
-    return True
-    
-m1_x_m2 = Matrix([
-        [ 13,  -9],
-        [ 37, -27]])
-
-m1_m2_inv = Matrix([
-        [1.5, -0.5],
-        [2.0555556, -0.722222222]
-        ])
-
-assert equal(m1_x_m2.inverse(), m1_m2_inv), """Error in your inverse function for the first 2 x 2 case"""
