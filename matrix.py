@@ -75,7 +75,6 @@ class Matrix(object):
             raise(ValueError, "Cannot calculate the trace of a non-square matrix.")
 
         trace = 0
-        
         for n in range(self.h):
             trace += self.g[n][n]
             
@@ -102,9 +101,9 @@ class Matrix(object):
         
         elif self.h == 2 and self.w == 2:
             factor = 1 / self.determinant()
-            I2 = Matrix([[1, 0], [0,1]])
-            trace_times_I2 = self.trace() * I2
-            trace_times_I2_minus_A = trace_times_I2 - self.g
+
+            trace_times_I2 = self.trace() * identity(2)
+            trace_times_I2_minus_A = trace_times_I2 - self
             
             inverse = factor * trace_times_I2_minus_A
             
@@ -205,7 +204,7 @@ class Matrix(object):
         """
         
         if self.h != other.h or self.w != other.w:
-            raise(ValueError, "Matrices can only be added if the dimensions are the same") 
+            raise(ValueError, "Matrices can only be subtracted if the dimensions are the same") 
             
         matrix_difference = []
         
@@ -263,3 +262,23 @@ class Matrix(object):
                 scalar_matrix.append(row)
                     
         return Matrix(scalar_matrix)
+    
+def equal(m1, m2):
+    if len(m1.g) != len(m2.g): return False
+    if len(m1.g[0]) != len(m2.g[0]): return False
+    for r1, r2 in zip(m1.g, m2.g):
+        for v1, v2 in zip(r1, r2):
+            if abs(v1 - v2) > 0.0001:
+                return False
+    return True
+    
+m1_x_m2 = Matrix([
+        [ 13,  -9],
+        [ 37, -27]])
+
+m1_m2_inv = Matrix([
+        [1.5, -0.5],
+        [2.0555556, -0.722222222]
+        ])
+
+assert equal(m1_x_m2.inverse(), m1_m2_inv), """Error in your inverse function for the first 2 x 2 case"""
