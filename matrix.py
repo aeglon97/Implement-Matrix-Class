@@ -120,7 +120,7 @@ class Matrix(object):
         for i_col in range(self.w):
             transposed_row = []
             for i_row in range(self.h):
-                transposed_row.append(self.g[i_col][i_row])
+                transposed_row.append(self.g[i_row][i_col])
                 
             transpose.append(transposed_row)
         
