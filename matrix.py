@@ -88,7 +88,7 @@ class Matrix(object):
         --> Similarly, if x * (1/x) = 1, then A * A^-1 = I.
         
         1x1 matrix -- Formal mathematical definition: A^-1 = [[1/a]] for a in matrix A.
-        2x2 matrix -- Formal mathematical definition: (1/det) * [(traceA * I) - A]
+        2x2 matrix -- Formal mathematical definition: A^-1 = (1/detA) * [(traceA * I_2) - A]
              
         """
         if not self.is_square():
@@ -102,10 +102,11 @@ class Matrix(object):
         
         elif self.h == 2 and self.w == 2:
             factor = 1 / self.determinant()
-            trace_times_I = self.trace() * identity(2)
-            trace_times_I_minus_A = trace_times_I - self.g
+            I2 = Matrix([[1, 0], [0,1]])
+            trace_times_I2 = self.trace() * I2
+            trace_times_I2_minus_A = trace_times_I2 - self.g
             
-            inverse = factor * trace_times_I_minus_A
+            inverse = factor * trace_times_I2_minus_A
             
             return inverse
         
@@ -210,7 +211,7 @@ class Matrix(object):
         
         for i_row in range(self.h):
             row_result = []
-            for col in range(other.w):
+            for i_col in range(other.w):
                 row_result.append(self.g[i_row][i_col] - other.g[i_row][i_col])
                 
             matrix_difference.append(row_result)
@@ -220,28 +221,30 @@ class Matrix(object):
     def __mul__(self, other):
         """
         Defines the behavior of * operator (matrix multiplication)
+        
+        matrixA * matrixB = dot product of every column (matrixB) per row in matrixA
         """
         
+        # If self or other is a Number, a mismatched type error will return after this if statement
+        # which will force the matrix to use its __rmul__ logic
         if self.w != other.h:
             raise(ValueError, "The number of columns of Matrix A must equal the number of rows in Matrix B")
-            
+
         matrix_product = []
 
-        
         for i_row in range(self.h):
             row_result = []
             for i_col in range(other.w):
                 col_vals = [row[i_col] for row in other.g]
                 row_result.append(dot_product(self.g[i_row], col_vals))
             matrix_product.append(row_result)
-            
+
         return Matrix(matrix_product)
-              
+
     #Scalar multiplication
     def __rmul__(self, other):
         """
         Called when the thing on the left of the * is a scalar value.
-
         Example:
 
         > identity = Matrix([ [1,0], [0,1] ])
@@ -254,7 +257,9 @@ class Matrix(object):
             scalar_matrix = []
             
             for i_row in range(self.h):
+                row = []
                 for i_col in range(self.w):
-                    scalar_matrix.append(self.g[i_row][i_col] * other)
+                    row.append(self.g[i_row][i_col] * other)
+                scalar_matrix.append(row)
                     
         return Matrix(scalar_matrix)
